@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'sh /root/test.sh'
+                sh 'sh /var/lib/jenkins/test.sh'
             }
         }
         stage('Deliver for development') {
