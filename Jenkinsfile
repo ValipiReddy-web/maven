@@ -19,7 +19,7 @@ pipeline {
                 branch 'dev'
             }
             steps {
-                sh './var/lib/jenkins/scripts/dev.sh'
+                sh 'sh /var/lib/jenkins/dev.sh'
                 input message: 'Finished using the web site? (Click "Proceed" to continue)'
             }
         }
@@ -28,7 +28,7 @@ pipeline {
                 branch 'bug'
             }
             steps {
-                sh './var/lib/jenkins/scripts/bug.sh'
+                sh 'sh /var/lib/jenkins/bug.sh'
                 input message: 'Finished using the web site? (Click "Proceed" to continue)'
             }
         }
