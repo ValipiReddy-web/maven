@@ -20,7 +20,6 @@ pipeline {
             }
             steps {
                 sh 'sh /var/lib/jenkins/dev.sh'
-                input message: 'Finished using the web site? (Click "Proceed" to continue)'
             }
         }
         stage('Deploy for production') {
@@ -29,7 +28,6 @@ pipeline {
             }
             steps {
                 sh 'sh /var/lib/jenkins/bug.sh'
-                input message: 'Finished using the web site? (Click "Proceed" to continue)'
             }
         }
     }
