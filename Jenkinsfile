@@ -38,7 +38,7 @@ pipeline {
           //sh 'mvn sonar:sonar'
           echo "sonar"
           //sh 'cat target/sonar/report-task.txt'
-        }
+        //}
       }
     }
     
