@@ -1,8 +1,6 @@
 pipeline {
   agent any 
-  tools {
-    maven 'Maven'
-  }
+  
   stages {
     stage ('Initialize') {
       steps {
@@ -16,7 +14,7 @@ pipeline {
     stage ('Check-Git-Secrets') {
       steps {
         sh 'rm trufflehog || true'
-        sh 'docker run gesellix/trufflehog --json https://github.com/cehkunal/webapp.git > trufflehog'
+        sh 'docker run gesellix/trufflehog --json https://github.com/ValipiReddy-web/maven.git > trufflehog'
         sh 'cat trufflehog'
       }
     }
@@ -35,6 +33,7 @@ pipeline {
     stage ('SAST') {
       steps {
         withSonarQubeEnv('sonar') {
+          sh 'docker run -d --name sonarqube -p 9000:9000 sonarqube'
           sh 'mvn sonar:sonar'
           sh 'cat target/sonar/report-task.txt'
         }
