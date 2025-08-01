@@ -1,3 +1,9 @@
+
+Devops project :  https://github.com/KubeKode/DevOps-Projects 
+kubernetes resoucre repo :  https://github.com/pelthepu/Kubernetes 
+helm repo : https://github.com/pelthepu/helm 
+GCP cloud run LB with terraform : https://github.com/KubeKode/GCP-cloudrun-lb-terraform 
+
 1. 🔧 Dockerfile for Each Microservice
 Example (microservices/patient-service/Dockerfile):
 
