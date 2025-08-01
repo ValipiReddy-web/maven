@@ -1,0 +1,138 @@
+1. 🔧 Dockerfile for Each Microservice
+Example (microservices/patient-service/Dockerfile):
+
+Dockerfile
+Copy
+Edit
+FROM node:18-alpine
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 3000
+CMD ["node", "app.js"]
+2. 🧱 Terraform Backend Configuration (terraform/backend.tf)
+hcl
+Copy
+Edit
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state-bucket"
+    key            = "devops-hackathon/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-lock"
+    encrypt        = true
+  }
+}
+3. 🌍 main.tf (simplified for EKS example)
+hcl
+Copy
+Edit
+provider "aws" {
+  region = "us-east-1"
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.1.0"
+  name    = "hackathon-vpc"
+  cidr    = "10.0.0.0/16"
+  azs     = ["us-east-1a", "us-east-1b"]
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
+}
+
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  cluster_name    = "hackathon-cluster"
+  cluster_version = "1.28"
+  subnets         = module.vpc.private_subnets
+  vpc_id          = module.vpc.vpc_id
+  enable_irsa     = true
+  node_groups = {
+    default = {
+      desired_capacity = 2
+      max_capacity     = 3
+      min_capacity     = 1
+      instance_type    = "t3.medium"
+    }
+  }
+}
+4. 🔐 variables.tf & outputs.tf
+Basic example:
+
+hcl
+Copy
+Edit
+# variables.tf
+variable "region" {
+  default = "us-east-1"
+}
+
+# outputs.tf
+output "cluster_name" {
+  value = module.eks.cluster_name
+}
+5. 💥 GitHub Actions Workflow (.github/workflows/terraform.yaml)
+yaml
+Copy
+Edit
+name: Terraform Plan & Apply
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    name: Terraform CI
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.6.0
+
+    - name: Terraform Format
+      run: terraform fmt -check -recursive
+
+    - name: Init
+      run: terraform init
+
+    - name: Validate
+      run: terraform validate
+
+    - name: Plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan
+
+    - name: Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+6. 📊 CloudWatch Monitoring (Add to your app.js)
+javascript
+Copy
+Edit
+const AWS = require('aws-sdk');
+const cloudwatch = new AWS.CloudWatch();
+
+function pushMetric() {
+  const params = {
+    MetricData: [{
+      MetricName: 'RequestCount',
+      Unit: 'Count',
+      Value: 1,
+      Dimensions: [{ Name: 'ServiceName', Value: 'PatientService' }]
+    }],
+    Namespace: 'HackathonApp'
+  };
+  cloudwatch.putMetricData(params, (err, data) => {
+    if (err) console.log(err, err.stack);
+  });
+}
+
+pushMetric();
